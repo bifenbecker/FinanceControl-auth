@@ -34,6 +34,7 @@ ALLOWED_HOSTS = os.environ.get("DJANGO_ALLOWED_HOSTS", "localhost *").split(" ")
 DEBUG = os.environ.get('DEBUG', default=1)
 IS_LOCAL = os.environ.get("IS_LOCAL", True)
 
+
 RABBITMQ_HOST = os.environ.get('RABBITMQ_HOST', 'localhost')
 
 # Application definition
