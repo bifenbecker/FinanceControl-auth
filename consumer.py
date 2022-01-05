@@ -1,7 +1,7 @@
 import pika
 from django.conf import settings
 
-credentials = pika.PlainCredentials('admin', 'admin')
+credentials = pika.PlainCredentials(settings.RABBITMQ_USER, settings.RABBITMQ_PASSWORD)
 
 params = pika.ConnectionParameters(settings.RABBITMQ_HOST, credentials=credentials)
 

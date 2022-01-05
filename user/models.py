@@ -6,14 +6,6 @@ from django.contrib.auth.models import AbstractUser
 from django.db import models
 
 
-CURRENCY_CHOICES = [
-    ('USD', '$'),
-    ('EUR', '€'),
-    ('RUB', '₽'),
-    ('BTC', 'BTC')
-]
-
-
 # region Models
 class User(AbstractUser):
     """
@@ -42,7 +34,7 @@ class Settings(models.Model):
     Settings of user
     """
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='settings', verbose_name="User settings")
-    currency = models.CharField(max_length=3, choices=CURRENCY_CHOICES, default='USD')
+    currency = models.CharField(max_length=3, choices=settings.CURRENCY_CHOICES, default='USD')
 
     @property
     def data(self):

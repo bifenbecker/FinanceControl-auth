@@ -34,8 +34,12 @@ ALLOWED_HOSTS = os.environ.get("DJANGO_ALLOWED_HOSTS", "localhost *").split(" ")
 DEBUG = os.environ.get('DEBUG', default=1)
 IS_LOCAL = os.environ.get("IS_LOCAL", True)
 
-
+# region RABBITMQ
 RABBITMQ_HOST = os.environ.get('RABBITMQ_HOST', 'localhost')
+RABBITMQ_USER = os.environ.get('RABBITMQ_USER', 'localhost')
+RABBITMQ_PASSWORD = os.environ.get('RABBITMQ_PASSWORD', 'localhost')
+# endregion
+
 
 # Application definition
 
@@ -156,7 +160,7 @@ CORS_ALLOW_CREDENTIALS = True
 
 # region JWT SETTINGS
 JWT = {
-    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=1),  # todo: Change value lifetime
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=10),
     'REFRESH_TOKEN_LIFETIME': timedelta(days=14),
     'ALGORITHM': 'RS256',
     'SIGNING_KEY_ACCESS': SECRET_KEY + "_access",
@@ -186,4 +190,17 @@ if not IS_LOCAL:
     # SECURE_CONTENT_TYPE_NOSNIFF = True
     # SECURE_BROWSER_XSS_FILTER = True
     # SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+# endregion
+
+
+# region Currencies
+#
+# Must be similar in other services
+CURRENCY_CHOICES = [
+    ('USD', '$'),
+    ('EUR', '€'),
+    ('RUB', '₽'),
+    ('BTC', 'BTC')
+]
+
 # endregion

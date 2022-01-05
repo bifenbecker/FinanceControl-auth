@@ -15,6 +15,7 @@ from rest_framework.viewsets import ViewSet
 
 from .models import User, Settings
 from .producer import logger
+from exceptions import *
 
 
 def verify_access_token(token: str) -> Union[dict, None]:
@@ -23,7 +24,7 @@ def verify_access_token(token: str) -> Union[dict, None]:
     """
 
     if not token:
-        raise Exception("No token")
+        raise TokenNotFound("No token")
 
     try:
         key = settings.KEY

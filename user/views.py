@@ -8,7 +8,7 @@ from rest_framework import viewsets
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from .models import User, RefreshToken, CURRENCY_CHOICES
+from .models import User, RefreshToken
 
 from .serializers import UserSerializer, SettingsSerializer
 from .utils import gen_pair_tokens, verify_user, validate_data_for_user, all_methods_check_token, process_response
@@ -133,7 +133,7 @@ class CurrencyList(APIView):
     @process_response
     def get(self, request):
         data = []
-        for cur in CURRENCY_CHOICES:
+        for cur in settings.CURRENCY_CHOICES:
             data.append({'name': cur[0], 'char': cur[1]})
 
         return data, status.HTTP_200_OK, None
