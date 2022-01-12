@@ -43,7 +43,7 @@ class Settings(models.Model):
         }
 
     def set_currency(self, new_currency: Optional[str]):
-        if new_currency in [choice_cur[0] for choice_cur in CURRENCY_CHOICES]:
+        if new_currency in [choice_cur[0] for choice_cur in settings.CURRENCY_CHOICES]:
             self.currency = new_currency
             self.save()
         else:
