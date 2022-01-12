@@ -14,8 +14,12 @@ from rest_framework.response import Response
 from rest_framework.viewsets import ViewSet
 
 from .models import User, Settings
-from .producer import logger
 from exceptions import *
+
+try:
+    from .producer import logger
+except:
+    print(f"[DEBUG] - {datetime.datetime.utcnow()} - [ERROR] - No connection to RABBIT_MQ")
 
 
 def verify_access_token(token: str) -> Union[dict, None]:
