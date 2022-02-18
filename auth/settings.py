@@ -173,23 +173,12 @@ AUDIENCES = [
 ]
 
 KEY = jwk.JWK.generate(kty='RSA', size=2048, kid=SECRET_KEY)
-# KEY = {
-#     'kty': 'RSA',
-#     'kid': 'secret',
-#     'n': 'zeiN0CxMfAVSooeKc4ia2U4Nk05aYD_geTwD4htNrbeoK0EKx4rCS9ED9ZaSa4vN5GTW5Ik-8LUg4kn1MxW2ZXnKrEyLHuPcvE8NLiXKzmjgs1plH4iNxTvG3k1enOLn-0kJSRVPfw7NotboU4Zj1WYENukVgKHoyisuBk07ELqIWKw1uP-xsjqiveeWEo3ELP5RyDKkiZ-a1fxLQGsKly7OhxoklHZhxugx2zuJKAivpSsgrcjDoxXudtvYzwX1DCjtHVz1E1VncihPjcRnDqN9rlGEx22tzSQxSKcGWa3ldCNSs_yGlcst2ALi-3Sq2JsoSgMlrgnTRu6SlXJ9WQ',
-#     'e': 'AQAB'
-# }
-# endregion
-
 
 # region HTTPS
 if not IS_LOCAL:
     SESSION_COOKIE_SECURE = True
     CSRF_COOKIE_SECURE = True
     SECURE_SSL_REDIRECT = True
-    # SECURE_CONTENT_TYPE_NOSNIFF = True
-    # SECURE_BROWSER_XSS_FILTER = True
-    # SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 # endregion
 
 

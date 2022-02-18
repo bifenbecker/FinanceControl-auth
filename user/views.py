@@ -16,8 +16,6 @@ from .utils import gen_pair_tokens, verify_user, validate_data_for_user, all_met
 
 @all_methods_check_token
 class UserViewSet(viewsets.ViewSet):
-    def list(self, request):
-        pass
 
     def retrieve(self, request, *args, **kwargs):
         serializer = UserSerializer(kwargs['user'])
@@ -99,7 +97,6 @@ class LoginView(APIView):
 
 def json_token(request):
     data = {
-        # "keys": [settings.KEY]
         "keys": [settings.KEY.export_public(as_dict=True)]
     }
     return HttpResponse(json.dumps(data))
@@ -128,8 +125,8 @@ class RefreshTokensView(APIView):
             return 'No such token', status.HTTP_400_BAD_REQUEST, 'No token'
 
 
-
 class CurrencyList(APIView):
+
     @process_response
     def get(self, request):
         data = []
@@ -141,6 +138,7 @@ class CurrencyList(APIView):
 
 @all_methods_check_token
 class UserSettingsView(viewsets.ViewSet):
+
     def get(self, request, *args, **kwargs):
         user = kwargs['user']
         user_settings_serializer = SettingsSerializer(instance=user.settings)
