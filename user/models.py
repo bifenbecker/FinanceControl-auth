@@ -1,5 +1,6 @@
 import datetime
 from typing import Optional
+from exceptions import NoSuchItem
 
 from django.conf import settings
 from django.contrib.auth.models import AbstractUser
@@ -47,7 +48,7 @@ class Settings(models.Model):
             self.currency = new_currency
             self.save()
         else:
-            raise Exception(f"No such currency - ({new_currency})")
+            raise NoSuchItem(f"No such currency - ({new_currency})")
 
 
 class RefreshToken(models.Model):
