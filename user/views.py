@@ -1,5 +1,6 @@
 import datetime
 import json
+import stripe
 
 from django.conf import settings
 from django.http import HttpResponse
@@ -9,9 +10,20 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from .models import User, RefreshToken
+from payments.models import (
+    StripeCustomer,
+    Subscription,
+    Plan
+)
 
 from .serializers import UserSerializer, SettingsSerializer
-from .utils import gen_pair_tokens, verify_user, validate_data_for_user, all_methods_check_token, process_response
+from .utils import (
+    gen_pair_tokens,
+    verify_user,
+    validate_data_for_user,
+    all_methods_check_token,
+    process_response
+)
 
 
 @all_methods_check_token
@@ -35,7 +47,7 @@ class UserViewSet(viewsets.ViewSet):
                 return serializer.data, status.HTTP_202_ACCEPTED, f'User was updated - {user.id}'
 
             except serializers.ValidationError as e:
-                return {'msg': e.get_full_details()[0]['message']}, status.HTTP_304_NOT_MODIFIED,\
+                return {'msg': e.get_full_details()[0]['message']}, status.HTTP_304_NOT_MODIFIED, \
                        'Update user error. Validation error(1)'
 
             except Exception as e:
@@ -56,6 +68,31 @@ class RegisterView(APIView):
         serializer = UserSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         user = serializer.save()
+
+        # Add Free subscribe
+        stripe.api_key = settings.STRIPE_SECRET_KEY
+        customers_api = stripe.Customer.list()['data']
+        if user.email not in [customer['email'] for customer in customers_api]:
+            customer_api = stripe.Customer.create(
+                email=user.email,
+                name=user.name
+            )
+        else:
+            customer_api = stripe.Customer.retrieve(
+                list(filter(lambda customer: customer['email'] == user.email, customers_api))[0]['id']
+            )
+
+        free_subscription = Subscription.objects.create(
+            plan=None,
+            sub_id=None
+        )
+        customer = StripeCustomer.objects.create(
+            user=user,
+            customer_id=customer_api['id'],
+            subscription=free_subscription
+        )
+        user.save()
+
         return serializer.data, status.HTTP_201_CREATED, f'Register new user - id:{user.id} Username:{user.username}'
 
 
@@ -70,29 +107,29 @@ class LoginView(APIView):
 
         if user is None:
             return {
-                'email': 'User not found!'
-            }, status.HTTP_404_NOT_FOUND, None
+                       'email': 'User not found!'
+                   }, status.HTTP_404_NOT_FOUND, None
 
         if not user.check_password(password):
             return {
-                'password': 'Incorrect password!'
-            }, status.HTTP_400_BAD_REQUEST, None
+                       'password': 'Incorrect password!'
+                   }, status.HTTP_400_BAD_REQUEST, None
 
         verified_user, response.status_code = verify_user(user)
 
         if not verified_user:
             return {
-                'msg': 'No user'
-            }, status.HTTP_404_NOT_FOUND, None
+                       'msg': 'No user'
+                   }, status.HTTP_404_NOT_FOUND, None
 
         access_token, refresh_token = gen_pair_tokens(user)
         user.last_login = datetime.datetime.utcnow()
         user.save()
 
         return {
-            'access_token': access_token,
-            'refresh_token': refresh_token
-        }, status.HTTP_200_OK, f'User - {user.id} logged'
+                   'access_token': access_token,
+                   'refresh_token': refresh_token
+               }, status.HTTP_200_OK, f'User - {user.id} logged'
 
 
 def json_token(request):
@@ -116,9 +153,9 @@ class RefreshTokensView(APIView):
                 refresh_token.delete()
                 access_token, refresh_token = gen_pair_tokens(user)
                 return {
-                    'access_token': access_token,
-                    'refresh_token': refresh_token
-                }, status.HTTP_200_OK, None
+                           'access_token': access_token,
+                           'refresh_token': refresh_token
+                       }, status.HTTP_200_OK, None
             else:
                 return 'No verify token', status.HTTP_403_FORBIDDEN, f'No verify token for user - {user.id}'
         else:
@@ -159,4 +196,3 @@ class UserSettingsView(viewsets.ViewSet):
         result = user_settings_serializer.data
         result.update({'access_token': access_token, 'refresh_token': refresh_token})
         return result, status.HTTP_200_OK, f'Settings of user - {user.id} was updated'
-

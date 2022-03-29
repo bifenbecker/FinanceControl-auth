@@ -17,6 +17,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.environ.get("SECRET_KEY", 'django-insecure-9d8^92=#!0*8^kum%mh&1$%@)po%&z_2!di8mr43o-+n-gc(3s')
 # DEBUG = int(os.environ.get("DEBUG", default=1))
 ALLOWED_HOSTS = os.environ.get("DJANGO_ALLOWED_HOSTS", "localhost *").split(" ")
+DOMAIN = 'http://localhost:10000'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 # DEBUG = True
@@ -41,7 +42,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'corsheaders',
-    'user'
+    'user',
+    'payments'
 ]
 
 REST_FRAMEWORK = {
@@ -82,18 +84,6 @@ TEMPLATES = [
 WSGI_APPLICATION = 'auth.wsgi.application'
 
 # Database
-# https://docs.djangoproject.com/en/3.2/ref/settings/#databases
-
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-#         'NAME': 'auth',
-#         'USER': 'admin',
-#         'PASSWORD': 'admin',
-#         'HOST': 'localhost',
-#         'PORT': '5432',
-#     }
-# }
 DATABASES = {
     'default': {
         "ENGINE": os.environ.get("SQL_ENGINE", "django.db.backends.postgresql"),
@@ -181,4 +171,16 @@ CURRENCY_CHOICES = [
     ('BTC', 'BTC')
 ]
 
+# endregion
+
+# region STRIPE#
+STRIPE_PUBLIC_KEY = 'pk_test_51KgrzbCGyC2siADwyVPp0sZRpwjkMDCrtaECpw43YQFF0O5CBZh1USuB76zQLsAzFLTkUWMjCa4FPIXgxjfCeJKe00fml4erhP'
+STRIPE_SECRET_KEY = 'sk_test_51KgrzbCGyC2siADwdxwj5m1xFvLWd5IRY53yInSPxEmQ934hdYo6PB6RZmDxKhYEA9T0KbxXlqix4ec04gems1oH00Mquu0w5A'
+STRIPE_PRODUCT_ID = 'prod_LO0gYSJvUqIVg2'
+STRIPE_PRICES_ID = [
+    'price_1KhEf4CGyC2siADwzvf1fDsY',  # 3$
+    'price_1KhEf4CGyC2siADwqmkkOXxj',  # 10$
+    'price_1KhEf4CGyC2siADwcqonUaJJ',  # 0.5$
+    'price_1KhEf4CGyC2siADwgy1ienEq'  # 0$
+]
 # endregion

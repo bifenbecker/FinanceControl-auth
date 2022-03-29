@@ -1,5 +1,9 @@
+from typing import Optional
+
 from rest_framework import serializers
 from rest_framework.utils.serializer_helpers import ReturnDict
+
+from payments.serializers import SubscriptionSerializer
 
 from .models import User, Settings
 from .utils import validate_data_for_user
@@ -28,17 +32,27 @@ class UserSerializer(serializers.ModelSerializer):
         except serializers.ValidationError:
             raise serializers.ValidationError
 
-    def get_user_settings(self, obj):
+    def get_user_settings(self, obj: Optional[User]) -> Optional[dict]:
         selected_settings = Settings.objects.filter(user=obj).first()
         if selected_settings:
             return SettingsSerializer(selected_settings).data
         else:
             return {}
 
+    def get_user_subscription(self, obj: Optional[User]) -> Optional[dict]:
+        if not obj.customer:
+            raise Exception('No customer')  # TODO: Make exception
+
+        current_sub = obj.customer.subscription
+        return SubscriptionSerializer(current_sub).data
+
     @property
     def data(self):
         data = super(UserSerializer, self).data
-        data.update({'settings': self.get_user_settings(self.instance)})
+        data.update({
+            'settings': self.get_user_settings(self.instance),
+            'current_sub': self.get_user_subscription(self.instance)
+        })
         del data['password']
         return ReturnDict(data, serializer=self)
 
