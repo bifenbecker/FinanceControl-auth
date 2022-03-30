@@ -19,6 +19,12 @@ class Subscription(models.Model):
     sub_id = models.CharField(max_length=64, verbose_name='ID', default=None, null=True)
     plan = models.OneToOneField(Plan, related_name='subscription', on_delete=models.CASCADE, default=None, null=True)
 
-    def set_plan(self, new_plan: Plan):
+    def set_plan(self, new_plan: Plan, sub_id):
         self.plan = new_plan
+        self.sub_id = sub_id
+        self.save()
+
+    def stop(self):
+        self.plan = None
+        self.sub_id = None
         self.save()

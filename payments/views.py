@@ -58,10 +58,7 @@ class StripeViews(viewsets.ViewSet):
                     expand=['latest_invoice.payment_intent'],
                 )
 
-                subscription = user.customer.subscription
-                subscription.set_plan(plan)
-                subscription.sub_id = subscription_api.id
-                subscription.save()
+                user.subscribe(plan, subscription_api.id)
 
                 return {
                            'subscriptionId': subscription_api.id,
@@ -77,13 +74,11 @@ class StripeViews(viewsets.ViewSet):
                 stripe.Subscription.delete(
                     user.customer.subscription.sub_id
                 )
-                subscription = user.customer.subscription
-                subscription.plan = None
-                subscription.sub_id = None
-                subscription.save()
+                user.cancel_subscribe()
+
                 return {'msg': 'Success. Current plan - Free'}, status.HTTP_200_OK, None
             else:
-                # Modify subscription
+                # Change subscription
                 stripe.Subscription.delete(
                     user.customer.subscription.sub_id,
                 )
@@ -98,10 +93,8 @@ class StripeViews(viewsets.ViewSet):
                     payment_behavior='default_incomplete',
                     expand=['latest_invoice.payment_intent'],
                 )
-                subscription = user.customer.subscription
-                subscription.set_plan(plan)
-                subscription.sub_id = new_subscription_api.id
-                subscription.save()
+                user.subscribe(plan, new_subscription_api.id)
+
                 return {
                     'subscriptionId': new_subscription_api.id,
                     'clientSecret': new_subscription_api.latest_invoice.payment_intent.client_secret

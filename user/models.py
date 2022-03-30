@@ -6,6 +6,8 @@ from django.conf import settings
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 
+from payments.models import Plan
+
 
 # region Models
 class User(AbstractUser):
@@ -28,6 +30,14 @@ class User(AbstractUser):
             token=token,
             user=self
         )
+
+    def subscribe(self, plan: Optional[Plan], sub_id):
+        subscription = self.customer.subscription
+        subscription.set_plan(plan, sub_id)
+
+    def cancel_subscribe(self):
+        subscription = self.customer.subscription
+        subscription.stop()
 
 
 class Settings(models.Model):
